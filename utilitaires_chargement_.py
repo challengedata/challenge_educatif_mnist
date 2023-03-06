@@ -182,3 +182,23 @@ def visualiser_caracteristiques_2d_dix(c_train_par_population):
     plt.legend(loc='upper left')
     plt.show()
     plt.close()
+
+# Fonction de score
+def score(y_est, y_vrai):
+    # Initialisation de la valeur de l'erreur
+    somme = 0
+    # On lance une erreur si y_est et y_vrai ne sont pas de la même taille
+    if len(y_est)!=len(y_vrai) :
+        raise ValueError("Les sorties comparées ne sont pas de la même taille.")
+    else :   # on incrémente la somme pour toute mauvaise estimation
+        for i in range(len(y_vrai)):
+            if y_est[i] != y_vrai[i]:
+                somme = somme + 1
+    return somme / len(y_vrai)
+
+# Moyenne
+def moyenne(liste_car):
+    somme = 0
+    for car in liste_car:
+        somme = somme + car
+    return somme / len(liste_car)
