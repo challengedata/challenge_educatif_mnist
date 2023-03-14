@@ -113,6 +113,10 @@ def sauver_et_telecharger_mnist_2(y_est_test, nom_du_fichier):
 def sauver_et_telecharger_mnist_4(y_est_test, nom_du_fichier):
     np.savetxt(nom_du_fichier, np.stack([ID_test_4, y_est_test], axis=-1), fmt='%d', delimiter=',', header='ID,targets')
     basthon.download(nom_du_fichier)
+    
+def sauver_et_telecharger_mnist_10(y_est_test, nom_du_fichier):
+    np.savetxt(nom_du_fichier, np.stack([ID_test_10, y_est_test], axis=-1), fmt='%d', delimiter=',', header='ID,targets')
+    basthon.download(nom_du_fichier)
 
 # Visualiser les histogrammes
 def visualiser_histogrammes_mnist_2(c_train):
@@ -198,7 +202,7 @@ def score(y_est, y_vrai):
 
 # Moyenne
 def moyenne(liste_car):
-    somme = 0
+    somme = 0.
     for car in liste_car:
-        somme = somme + car
+        somme = somme + car.astype(float)
     return somme / len(liste_car)
