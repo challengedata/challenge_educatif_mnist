@@ -1,5 +1,5 @@
 # Import des librairies utilisées dans le notebook
-import basthon
+#import basthon
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +21,7 @@ zf.close()
 output_train_url = "https://raw.githubusercontent.com/challengedata/challenge_educatif_mnist/main/y_train_10.csv"
 output_train = requests.get(output_train_url)
 
-# Création des variables d'inputs, outputs et indices pour les datasets MNIST-2, MNIST-4 et MNIST-10 
+# Création des variables d'inputs, outputs et indices pour les datasets MNIST-2, MNIST-4 et MNIST-10
 
 # MNIST-10
 
@@ -31,13 +31,13 @@ with open('mnist_10_x_train.pickle', 'rb') as f:
 
 with open('mnist_10_x_test.pickle', 'rb') as f:
     ID_test_10, x_test_10 = pickle.load(f).values()
-    
+
 # Outputs
-_, y_train_10 = [np.loadtxt(StringIO(output_train.content.decode('utf-8')), 
+_, y_train_10 = [np.loadtxt(StringIO(output_train.content.decode('utf-8')),
                                 dtype=int, delimiter=',')[:,k] for k in [0,1]]
 
 # Les challenges MNIST-2 et MNIST-4 sont des sous-ensembles de MNIST-10.
-# MNIST-4 
+# MNIST-4
 
 # Inputs
 with open('mnist_4_x_train.pickle', 'rb') as f:
@@ -70,7 +70,7 @@ def affichage(image):
     plt.imshow(image, cmap='gray')
     plt.show()
     plt.close()
-    
+
 # Affichage de dix images
 def affichage_dix(images):
     fig, ax = plt.subplots(1, 10, figsize=(10,1))
@@ -81,7 +81,7 @@ def affichage_dix(images):
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0.05, hspace=0.05)
     plt.show()
     plt.close()
-    
+
 # Affichage de vingt images
 def affichage_vingt(images):
     fig, ax = plt.subplots(2, 10, figsize=(10,2))
@@ -92,7 +92,7 @@ def affichage_vingt(images):
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0.05, hspace=0.05)
     plt.show()
     plt.close()
-    
+
 # Affichage de trente images
 def affichage_trente(images):
     fig, ax = plt.subplots(3, 10, figsize=(10,3))
@@ -102,7 +102,7 @@ def affichage_trente(images):
         ax[k//10,k%10].set_yticks([])
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0.05, hspace=0.05)
     plt.show()
-    plt.close()  
+    plt.close()
 
 # Sauver le .csv
 
@@ -113,7 +113,7 @@ def sauver_et_telecharger_mnist_2(y_est_test, nom_du_fichier):
 def sauver_et_telecharger_mnist_4(y_est_test, nom_du_fichier):
     np.savetxt(nom_du_fichier, np.stack([ID_test_4, y_est_test], axis=-1), fmt='%d', delimiter=',', header='ID,targets')
     basthon.download(nom_du_fichier)
-    
+
 def sauver_et_telecharger_mnist_10(y_est_test, nom_du_fichier):
     np.savetxt(nom_du_fichier, np.stack([ID_test_10, y_est_test], axis=-1), fmt='%d', delimiter=',', header='ID,targets')
     basthon.download(nom_du_fichier)
@@ -150,22 +150,22 @@ def visualiser_histogrammes_mnist_4(c_train_par_population):
     plt.show()
     plt.close()
 
-# Visualiser les histogrammes 2D 
+# Visualiser les histogrammes 2D
 def visualiser_histogrammes_2d_mnist_4(c_train_par_population):
     digits = [0,1,4,8]
     nb_digits = 4
-    
-    # Moyennes
-    N = len(c_train_par_population[0][:,0])
-    M_x = [sum(c_train_par_population[i][:,0])/N for i in range(nb_digits)]
-    M_y = [sum(c_train_par_population[i][:,1])/N for i in range(nb_digits)]
 
-    # Quatre premières couleurs par défaut de Matplotlib 
+    # Moyennes
+    N = [len(c_train_par_population[i][:,0]) for i in range(nb_digits)]
+    M_x = [sum(c_train_par_population[i][:,0])/N[i] for i in range(nb_digits)]
+    M_y = [sum(c_train_par_population[i][:,1])/N[i] for i in range(nb_digits)]
+
+    # Quatre premières couleurs par défaut de Matplotlib
     colors = {0:'C0', 1:'C1', 4:'C2', 8:'C3'}
     # Palette de couleurs interpolant du blanc à chacune de ces couleurs, avec N=100 nuances
     cmaps = [LinearSegmentedColormap.from_list("", ["w", colors[i]], N=100) for i in digits]
-    # Ajout de transparence pour la superposition des histogrammes : 
-    # plus la couleur est proche du blanc, plus elle est transparente 
+    # Ajout de transparence pour la superposition des histogrammes :
+    # plus la couleur est proche du blanc, plus elle est transparente
     cmaps_alpha = []
     for cmap in cmaps:
         cmap._init()
@@ -173,15 +173,17 @@ def visualiser_histogrammes_2d_mnist_4(c_train_par_population):
         cmaps_alpha += [ListedColormap(cmap._lut[:-3,:])]
 
     maxs_ = np.concatenate(c_train_par_population).max(axis=0)
-    fig, ax = plt.subplots(figsize=(5,5))
+    fig, ax = plt.subplots(figsize=(10,10))
     for i in reversed(range(nb_digits)):  # ordre inversé pour un meilleur rendu
-        ax.hist2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1], 
-                  bins=[np.linspace(0,maxs_[0],80), np.linspace(0,maxs_[1],80)], cmap=cmaps_alpha[i])
-        ax.plot((M_x[i], M_y[i]))
+        ax.hist2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1],
+                  bins=[np.linspace(0,maxs_[0],100), np.linspace(0,maxs_[1],100)], cmap=cmaps_alpha[i])
+
+    for i in reversed(range(nb_digits)):
+        ax.scatter(M_x[i], M_y[i], marker = 'o', s = 70, edgecolor='black', linewidth=1.5, facecolor=colors[list(colors.keys())[i]])
 
     patches = [mpatches.Patch(color=colors[i], label=i) for i in digits]
     ax.legend(handles=patches,loc='upper left')
-    
+
     plt.show()
     plt.close()
 
