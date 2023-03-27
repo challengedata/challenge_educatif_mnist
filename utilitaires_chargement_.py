@@ -154,6 +154,11 @@ def visualiser_histogrammes_mnist_4(c_train_par_population):
 def visualiser_histogrammes_2d_mnist_4(c_train_par_population):
     digits = [0,1,4,8]
     nb_digits = 4
+    
+    # Moyennes
+    N = len(c_train_par_population[0][:,0])
+    M_x = [sum(c_train_par_population[i][:,0])/N for i in range(nb_digits)]
+    M_y = [sum(c_train_par_population[i][:,1])/N for i in range(nb_digits)]
 
     # Quatre premières couleurs par défaut de Matplotlib 
     colors = {0:'C0', 1:'C1', 4:'C2', 8:'C3'}
@@ -172,9 +177,11 @@ def visualiser_histogrammes_2d_mnist_4(c_train_par_population):
     for i in reversed(range(nb_digits)):  # ordre inversé pour un meilleur rendu
         ax.hist2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1], 
                   bins=[np.linspace(0,maxs_[0],80), np.linspace(0,maxs_[1],80)], cmap=cmaps_alpha[i])
+        ax.plot((M_x[i], M_y[i]))
 
     patches = [mpatches.Patch(color=colors[i], label=i) for i in digits]
     ax.legend(handles=patches,loc='upper left')
+    
     plt.show()
     plt.close()
 
