@@ -180,7 +180,7 @@ def visualiser_histogrammes_2d_mnist_4(c_train):
         cmaps_alpha += [ListedColormap(cmap._lut[:-3,:])]
 
     maxs_ = np.concatenate(c_train_par_population).max(axis=0)
-    fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(7,7))
     for i in reversed(range(nb_digits)):  # ordre inversé pour un meilleur rendu
         ax.hist2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1],
                   bins=[np.linspace(0,maxs_[0],100), np.linspace(0,maxs_[1],100)], cmap=cmaps_alpha[i])
