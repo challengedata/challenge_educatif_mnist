@@ -1,5 +1,5 @@
 # Import des librairies utilisées dans le notebook
-#import basthon
+import basthon
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
@@ -64,6 +64,10 @@ y_train_2 = y_train_10[np.isin(y_train_10, [0,1])]
 # Example image
 image_url = "https://raw.githubusercontent.com/challengedata/challenge_educatif_mnist/main/x.npy"
 x = np.load(BytesIO(requests.get(image_url).content))
+
+
+chiffres = [0,1,4,8]
+x_train_par_population = [x_train_4[y_train_4==k] for k in chiffres]
 
 # Affichage d'une image
 def affichage(image):
@@ -151,7 +155,10 @@ def visualiser_histogrammes_mnist_4(c_train_par_population):
     plt.close()
 
 # Visualiser les histogrammes 2D
-def visualiser_histogrammes_2d_mnist_4(c_train_par_population):
+def visualiser_histogrammes_2d_mnist_4(c_train):
+
+    c_train_par_population = par_population(c_train)
+
     digits = [0,1,4,8]
     nb_digits = 4
 
@@ -215,3 +222,24 @@ def moyenne(liste_car):
     for car in liste_car:
         somme = somme + car.astype(float)
     return somme / len(liste_car)
+
+def par_population(liste):
+    # Créer une liste de liste qui divise par population, comme par exemple pour liste = c_train
+    return [np.array(liste)[y_train_4==k] for k in chiffres]
+
+def distance_carre(a,b):
+    # a et b sont supposés être des points en deux dimensions contenus dans des listes de longueur deux
+    return (a[0]-b[0])**2 + (a[1]-b[1])**2
+
+def classification_2d_MNIST4(c, theta):
+
+    #c_train_moyennes_par_population = [moyenne(liste_car) for liste_car in c_train_par_population]
+
+    # On définit d'abord les différentes estimations possibles
+    chiffres = [0,1,4,8]
+    # On calcule le carré des distances entre la caractéristique c et les caractéristiques moyennes
+    dist = [distance_carre(c, theta_i) for theta_i in theta]
+    # On extrait l'indice minimisant cette distance
+    index_min = dist.index(min(dist))
+    # On renvoie le chiffre correspondant
+    return chiffres[index_min]
