@@ -1,5 +1,5 @@
 # Import des librairies utilisées dans le notebook
-import basthon
+#import basthon
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
@@ -180,7 +180,7 @@ def visualiser_histogrammes_2d_mnist_4(c_train):
         cmaps_alpha += [ListedColormap(cmap._lut[:-3,:])]
 
     maxs_ = np.concatenate(c_train_par_population).max(axis=0)
-    fig, ax = plt.subplots(figsize=(7,7))
+    fig, ax = plt.subplots(figsize=(10,10))
     for i in reversed(range(nb_digits)):  # ordre inversé pour un meilleur rendu
         ax.hist2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1],
                   bins=[np.linspace(0,maxs_[0],100), np.linspace(0,maxs_[1],100)], cmap=cmaps_alpha[i])
@@ -193,6 +193,67 @@ def visualiser_histogrammes_2d_mnist_4(c_train):
 
     plt.show()
     plt.close()
+
+def visualiser_histogrammes_2d_mnist_4_max(c_train):
+
+    c_train_par_population = par_population(c_train)
+
+    digits = [0,1,4,8]
+    nb_digits = 4
+
+    # Moyennes
+    N = [len(c_train_par_population[i][:,0]) for i in range(nb_digits)]
+    M_x = [sum(c_train_par_population[i][:,0])/N[i] for i in range(nb_digits)]
+    M_y = [sum(c_train_par_population[i][:,1])/N[i] for i in range(nb_digits)]
+
+    max_list = max_hist_2d_mnist4(c_train)
+
+    # Quatre premières couleurs par défaut de Matplotlib
+    colors = {0:'C0', 1:'C1', 4:'C2', 8:'C3'}
+    # Palette de couleurs interpolant du blanc à chacune de ces couleurs, avec N=100 nuances
+    cmaps = [LinearSegmentedColormap.from_list("", ["w", colors[i]], N=100) for i in digits]
+    # Ajout de transparence pour la superposition des histogrammes :
+    # plus la couleur est proche du blanc, plus elle est transparente
+    cmaps_alpha = []
+    for cmap in cmaps:
+        cmap._init()
+        cmap._lut[:-3,-1] = np.linspace(0, 1, cmap.N)  # la transparence va de 0 (complètement transparent) à 1 (opaque)
+        cmaps_alpha += [ListedColormap(cmap._lut[:-3,:])]
+
+    maxs_ = np.concatenate(c_train_par_population).max(axis=0)
+    fig, ax = plt.subplots(figsize=(10,10))
+    for i in reversed(range(nb_digits)):  # ordre inversé pour un meilleur rendu
+        ax.hist2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1],
+                  bins=[np.linspace(0,maxs_[0],100), np.linspace(0,maxs_[1],100)], cmap=cmaps_alpha[i])
+
+    for i in reversed(range(nb_digits)):
+        ax.scatter(max_list[i][0], max_list[i][1], marker = 'o', s = 70, edgecolor='black', linewidth=1.5, facecolor=colors[list(colors.keys())[i]])
+
+    patches = [mpatches.Patch(color=colors[i], label=i) for i in digits]
+    ax.legend(handles=patches,loc='upper left')
+
+    plt.show()
+    plt.close()
+
+
+def max_hist_2d_mnist4(c_train):
+    # Trouve les coordonnées qui réalisent le max de chaque hist 2D de la caractéristique
+
+    c_train_par_population = par_population(c_train)
+
+    digits = [0,1,4,8]
+    nb_digits = 4
+    max_list = []
+
+    maxs_ = np.concatenate(c_train_par_population).max(axis=0)
+    for i in range(nb_digits):
+        H, xedges, yedges = np.histogram2d(c_train_par_population[i][:,0], c_train_par_population[i][:,1],
+            bins=[np.linspace(0,maxs_[0],100), np.linspace(0,maxs_[1],100)])
+        x, y = np.argwhere(H == H.max())[0]
+        max_list.append([np.average(xedges[x:x + 2]), np.average(yedges[y:y + 2])])
+
+    return max_list
+
 
 # Visualiser dans le plan dix caractéristiques 2D pour chaque population
 def visualiser_caracteristiques_2d_dix(c_train_par_population):
